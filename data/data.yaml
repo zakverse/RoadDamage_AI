@@ -1,0 +1,9 @@
+path: z:/Projects/RoadDamage_AI/data
+train: train/images
+val: val/images
+test: test/images
+nc: 3
+names:
+- pothole
+- crack
+- manhole
