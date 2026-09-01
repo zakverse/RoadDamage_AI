@@ -415,6 +415,66 @@ curl -X POST "http://127.0.0.1:8000/predict?conf=0.25" \
 
 ---
 
+## 🌐 Panduan Deployment (Vercel & Render)
+
+Proyek **RoadDamage AI** dirancang dengan arsitektur *decoupled* yang siap di-deploy secara publik:
+- **Frontend (Web UI)**: Di-deploy ke **Vercel** (CDN cepat, gratis, custom domain).
+- **Backend (API & YOLOv8n)**: Di-deploy ke **Render** (Python Web Service dengan dependensi PyTorch dan OpenCV).
+
+```text
+User (Browser)
+  ↓
+Vercel (React + Vite Frontend)
+  ↓ HTTPS API
+Render (FastAPI Backend + YOLOv8n)
+  ↓
+backend/models/road_damage.pt
+  ↓
+Detection Result (JSON)
+```
+
+### Langkah 1: Deploy Backend ke Render
+1. Masuk ke [dashboard.render.com](https://dashboard.render.com/) dan buat **New +** → **Web Service**.
+2. Hubungkan repository GitHub: `RoadDamage_AI`.
+3. Konfigurasi pengaturan layanan:
+   - **Name:** `roaddamage-ai-backend` (atau nama pilihan Anda)
+   - **Region:** Singapore / Frankfurt / Oregon (pilih yang terdekat)
+   - **Root Directory:** `backend`
+   - **Runtime:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Instance Type:** Free (512 MB RAM)
+4. Klik **Deploy Web Service**.
+5. Tunggu hingga proses build selesai dan status menjadi **Live**. Salin URL publik backend Anda, misalnya:  
+   `https://roaddamage-ai-backend.onrender.com`
+6. Uji kesehatan backend di browser:  
+   👉 `https://roaddamage-ai-backend.onrender.com/health` (harus menampilkan `{"status": "ok", "model_loaded": true, ...}`)
+
+### Langkah 2: Deploy Frontend ke Vercel
+1. Masuk ke [vercel.com](https://vercel.com/) dan klik **Add New...** → **Project**.
+2. Import repository `RoadDamage_AI`.
+3. Pada halaman konfigurasi project:
+   - **Framework Preset:** `Vite`
+   - **Root Directory:** Klik **Edit** dan pilih folder **`frontend`**.
+   - **Build Command:** `npm run build` (default)
+   - **Output Directory:** `dist` (default)
+4. Buka bagian **Environment Variables** dan tambahkan:
+   - **Key:** `VITE_API_URL`
+   - **Value:** `https://roaddamage-ai-backend.onrender.com` *(Ganti dengan URL backend Render Anda dari Langkah 1, tanpa garis miring di akhir)*
+5. Klik tombol **Deploy**.
+6. Setelah build selesai, Vercel akan memberikan domain publik, misalnya:  
+   `https://roaddamage-ai.vercel.app`
+
+### Langkah 3: Pengaturan CORS Backend (Opsional & Direkomendasikan)
+Setelah frontend Vercel aktif:
+1. Buka kembali dashboard Render backend Anda → menu **Environment**.
+2. Tambahkan variable:
+   - **Key:** `FRONTEND_URL`
+   - **Value:** `https://roaddamage-ai.vercel.app`
+3. Render akan otomatis me-restart server dengan proteksi CORS yang hanya mengizinkan domain Vercel Anda dan localhost.
+
+---
+
 ## 📓 Notebooks
 
 Folder `notebooks/` berisi 7 Jupyter Notebook yang dapat dijalankan secara berurutan untuk menelusuri seluruh siklus eksperimen:

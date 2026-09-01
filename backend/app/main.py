@@ -1,3 +1,4 @@
+import os
 import io
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
@@ -13,14 +14,36 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Konfigurasi CORS agar frontend (React + Vite) dapat memanggil API tanpa kendala
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Konfigurasi CORS: Mengizinkan request dari frontend (Vercel di production & localhost di development)
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+
+# Tambahkan URL production jika diset melalui environment variable FRONTEND_URL
+frontend_env = os.environ.get("FRONTEND_URL")
+if frontend_env:
+    for origin in frontend_env.split(","):
+        cleaned = origin.strip()
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # Jika FRONTEND_URL belum ditentukan, izinkan semua origin agar pengujian awal lancar
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.on_event("startup")
@@ -53,14 +76,16 @@ def health_check():
     try:
         _, active_path = model.get_model()
         loaded = True
+        # Bersihkan path agar menjadi path relatif yang rapi
+        display_path = os.path.basename(active_path) if active_path != "None" else "None"
     except Exception:
-        active_path = "None"
+        display_path = "None"
         loaded = False
 
     return schemas.HealthResponse(
         status="ok",
         model_loaded=loaded,
-        model_path=active_path,
+        model_path=display_path,
         classes=list(config.CLASS_NAMES.values())
     )
 
@@ -77,10 +102,10 @@ async def predict_image(
     if file.content_type not in ["image/jpeg", "image/png", "image/jpg", "image/webp"]:
         raise HTTPException(
             status_code=400,
-            detail=f"Format file '{file.content_type}' tidak didukung. Harap unggah gambar JPG atau PNG."
+            detail=f"Format file '{file.content_type}' tidak didukung. Harap unggah gambar JPG, PNG, atau WEBP."
         )
 
-    # Validasi range confidence
+    # Validasi rentang confidence
     if not (0.01 <= conf <= 1.0):
         raise HTTPException(
             status_code=400,
@@ -90,7 +115,13 @@ async def predict_image(
     try:
         # Baca bytes gambar
         contents = await file.read()
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        try:
+            image = Image.open(io.BytesIO(contents)).convert("RGB")
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail="File yang diunggah rusak atau bukan citra gambar yang valid."
+            )
 
         # Jalankan prediksi
         detections, class_counts, annotated_img = model.predict_road_damage(
@@ -106,6 +137,8 @@ async def predict_image(
             annotated_image=annotated_img
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,

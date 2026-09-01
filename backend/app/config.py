@@ -2,10 +2,10 @@ import os
 
 # Konfigurasi Backend RoadDamage_AI
 
-# Direktori dasar backend
+# Direktori dasar backend (path relatif dari file ini)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Path model YOLOv8n
+# Path model YOLOv8n (default: backend/models/road_damage.pt)
 MODEL_PATH = os.path.join(BASE_DIR, "models", "road_damage.pt")
 
 # Fallback path jika model belum disalin ke backend/models/
@@ -24,6 +24,6 @@ CLASS_NAMES = {
 # Confidence threshold default
 DEFAULT_CONFIDENCE = 0.25
 
-# Pengaturan Server
-HOST = "0.0.0.0"
-PORT = 8000
+# Pengaturan Server (Mendukung environment variable HOST dan PORT dari cloud hosting seperti Render)
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", 8000))

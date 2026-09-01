@@ -11,7 +11,8 @@ import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import { AlertCircle, X, Sparkles } from 'lucide-react';
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+// Mengambil API Base URL dari environment variable (Vite) atau fallback ke localhost
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 
 export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -47,6 +48,20 @@ export default function App() {
   }, []);
 
   const handleImageSelected = (file) => {
+    if (!file) return;
+
+    // Validasi tipe file citra
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage('Format file tidak didukung. Harap unggah file gambar (JPG, PNG, atau WEBP).');
+      return;
+    }
+
+    // Validasi batas ukuran file (maksimal 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage('Ukuran gambar terlalu besar (maksimal 10MB). Harap pilih gambar yang lebih kecil.');
+      return;
+    }
+
     setSelectedFile(file);
     setImagePreview(URL.createObjectURL(file));
     setResult(null);
@@ -63,24 +78,35 @@ export default function App() {
     formData.append('file', selectedFile);
     formData.append('conf', confidence);
 
+    // Buat AbortController untuk timeout 30 detik (menghindari request menggantung jika server lambat)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
       const response = await fetch(`${API_BASE_URL}/predict`, {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.detail || `Server returned ${response.status}`);
+        throw new Error(errData.detail || `Server mengembalikan status HTTP ${response.status}`);
       }
 
       const data = await response.json();
       setResult(data);
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Detection error:', error);
-      setErrorMessage(
-        error.message || 'Failed to connect to backend API. Please make sure the FastAPI server is running on port 8000.'
-      );
+      if (error.name === 'AbortError') {
+        setErrorMessage('Waktu proses habis (timeout 30 detik). Server membutuhkan waktu lebih lama untuk memproses gambar.');
+      } else {
+        setErrorMessage(
+          error.message || 'Gagal terhubung ke backend API. Pastikan server backend sedang aktif dan dapat diakses.'
+        );
+      }
     } finally {
       setIsLoading(false);
     }
