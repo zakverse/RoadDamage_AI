@@ -472,6 +472,36 @@ Setelah frontend Vercel aktif:
    - **Key:** `FRONTEND_URL`
    - **Value:** `https://roaddamage-ai.vercel.app`
 3. Render akan otomatis me-restart server dengan proteksi CORS yang hanya mengizinkan domain Vercel Anda dan localhost.
+---
+
+## 🎈 Streamlit Community Cloud Deployment
+
+Selain arsitektur fullstack terpisah (React + FastAPI), proyek **RoadDamage AI** juga menyediakan **Streamlit App Standalone (`streamlit_app.py`)** yang dirancang khusus untuk demo instan di **Streamlit Community Cloud**.
+
+### Karakteristik Versi Streamlit:
+- **Zero-Backend Dependency:** Model `backend/models/road_damage.pt` di-load langsung di dalam aplikasi Python secara *native* tanpa memerlukan server FastAPI terpisah.
+- **Cocok untuk Showcase Portofolio:** Sangat praktis untuk presentasi live, link portofolio GitHub, dan evaluasi cepat tanpa perlu mengelola dua server berbeda.
+- **Kompatibilitas Cloud Tinggi:** Seluruh path berbasis `pathlib.Path` yang aman untuk environment Linux dan dependensi diatur menggunakan `opencv-python-headless` di dalam [requirements-streamlit.txt](file:///z:/Projects/RoadDamage_AI/requirements-streamlit.txt).
+
+### Cara Menjalankan Streamlit Secara Lokal:
+```bash
+# 1. Install dependensi Streamlit
+pip install -r requirements-streamlit.txt
+
+# 2. Jalankan aplikasi Streamlit
+streamlit run streamlit_app.py
+```
+Aplikasi akan otomatis terbuka di browser pada alamat: `http://localhost:8501`.
+
+### Cara Deploy ke Streamlit Community Cloud (Gratis):
+1. Masuk ke [share.streamlit.io](https://share.streamlit.io/) dan login menggunakan akun GitHub Anda.
+2. Klik tombol **New app**.
+3. Isi konfigurasi form:
+   - **Repository:** `zakverse/RoadDamage_AI`
+   - **Branch:** `main`
+   - **Main file path:** `streamlit_app.py`
+4. Klik **Deploy!** 🚀
+Streamlit Community Cloud akan membaca dependensi dari [requirements-streamlit.txt](file:///z:/Projects/RoadDamage_AI/requirements-streamlit.txt) secara otomatis dan mempublikasikan aplikasi dalam 2–3 menit.
 
 ---
 
