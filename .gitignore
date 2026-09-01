@@ -23,3 +23,6 @@ yolov8n.pt
 Thumbs.db
 .vscode/
 .idea/
+
+.agent/
+*.cache

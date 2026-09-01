@@ -1,24 +1,44 @@
 import React from 'react';
 
-export default function ClassBadge({ className, count }) {
+export default function ClassBadge({ className }) {
   const normalized = (className || '').toLowerCase();
-  
-  let badgeClass = 'badge-pothole';
-  let label = 'Pothole';
 
-  if (normalized === 'crack' || normalized.includes('crack')) {
-    badgeClass = 'badge-crack';
-    label = 'Crack';
-  } else if (normalized === 'manhole' || normalized.includes('manhole')) {
-    badgeClass = 'badge-manhole';
-    label = 'Manhole';
-  }
+  const configs = {
+    pothole: {
+      label: 'Pothole',
+      bg: 'bg-amber-100',
+      text: 'text-amber-900',
+      border: 'border-amber-300',
+      dot: 'bg-amber-500'
+    },
+    crack: {
+      label: 'Crack',
+      bg: 'bg-rose-100',
+      text: 'text-rose-900',
+      border: 'border-rose-300',
+      dot: 'bg-rose-500'
+    },
+    manhole: {
+      label: 'Manhole',
+      bg: 'bg-sky-100',
+      text: 'text-sky-900',
+      border: 'border-sky-300',
+      dot: 'bg-sky-500'
+    }
+  };
+
+  const current = configs[normalized] || {
+    label: className || 'Unknown',
+    bg: 'bg-slate-100',
+    text: 'text-slate-800',
+    border: 'border-slate-300',
+    dot: 'bg-slate-400'
+  };
 
   return (
-    <span className={`badge ${badgeClass}`}>
-      <span>●</span>
-      {label}
-      {count !== undefined && <span style={{ opacity: 0.8, marginLeft: 4 }}>({count})</span>}
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-heading font-bold border ${current.bg} ${current.text} ${current.border} shadow-sm`}>
+      <span className={`w-2 h-2 rounded-full ${current.dot}`}></span>
+      {current.label}
     </span>
   );
 }
