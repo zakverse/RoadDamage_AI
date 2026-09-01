@@ -71,6 +71,7 @@ def read_root():
 
 
 @app.get("/health", response_model=schemas.HealthResponse, summary="Health Check")
+@app.get("/api/health", response_model=schemas.HealthResponse, summary="Health Check (API Prefix)", include_in_schema=False)
 def health_check():
     """Memeriksa status kesiapan server dan model."""
     try:
@@ -91,6 +92,7 @@ def health_check():
 
 
 @app.post("/predict", response_model=schemas.PredictionResponse, summary="Deteksi Kerusakan Jalan")
+@app.post("/api/predict", response_model=schemas.PredictionResponse, summary="Deteksi Kerusakan Jalan (API Prefix)", include_in_schema=False)
 async def predict_image(
     file: UploadFile = File(..., description="File gambar jalan (JPG/PNG) yang ingin dianalisis"),
     conf: float = Form(default=config.DEFAULT_CONFIDENCE, description="Batas confidence score (0.01 - 1.0)")

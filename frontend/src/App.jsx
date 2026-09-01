@@ -11,8 +11,14 @@ import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import { AlertCircle, X, Sparkles } from 'lucide-react';
 
-// Mengambil API Base URL dari environment variable (Vite) atau fallback ke localhost
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
+// Mengambil API Base URL:
+// - Jika VITE_API_URL didefinisikan (misal: "https://backend.onrender.com"), gunakan URL tersebut.
+// - Jika VITE_API_URL diset kosong (""), gunakan same-origin path ("/api/health" & "/api/predict").
+// - Jika tidak didefinisikan (default local dev), gunakan "http://127.0.0.1:8000".
+const RAW_API_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = RAW_API_URL !== undefined ? RAW_API_URL.replace(/\/+$/, '') : 'http://127.0.0.1:8000';
+const HEALTH_URL = API_BASE_URL ? `${API_BASE_URL}/health` : '/api/health';
+const PREDICT_URL = API_BASE_URL ? `${API_BASE_URL}/predict` : '/api/predict';
 
 export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -28,7 +34,7 @@ export default function App() {
   const checkHealth = async () => {
     try {
       setCheckingStatus(true);
-      const res = await fetch(`${API_BASE_URL}/health`);
+      const res = await fetch(HEALTH_URL);
       if (res.ok) {
         setIsBackendOnline(true);
       } else {
@@ -83,7 +89,7 @@ export default function App() {
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/predict`, {
+      const response = await fetch(PREDICT_URL, {
         method: 'POST',
         body: formData,
         signal: controller.signal,
