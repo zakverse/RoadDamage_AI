@@ -467,4 +467,4 @@ Project **RoadDamage AI** disusun sebagai bagian dari proses pembelajaran dan tu
 ## 👥 Tim Pengembang
 
 Project ini dikembangkan oleh:
-- **Kelompok Road Damage** — *Week 3 Assignment & Internship Project di Vinix7*
+- **Kelompok 2 - Road Damage** — *Internship Project di Vinix7*
