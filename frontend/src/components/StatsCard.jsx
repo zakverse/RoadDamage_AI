@@ -29,15 +29,15 @@ export default function StatsCard({ type, label, count }) {
   const Icon = current.icon;
 
   return (
-    <div className={`${current.cardClass} p-3.5 sm:p-4 flex items-center gap-3.5`}>
-      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${current.iconBg} shadow-sm shrink-0`}>
-        <Icon size={20} className="stroke-[2.5]" />
+    <div className={`${current.cardClass} p-2.5 sm:p-4 flex items-center gap-2 sm:gap-3.5 min-w-0`}>
+      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center ${current.iconBg} shadow-sm shrink-0`}>
+        <Icon size={17} className="stroke-[2.5]" />
       </div>
-      <div>
-        <p className="text-xs font-heading font-semibold text-slate-500 uppercase tracking-wider">
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] sm:text-xs font-heading font-semibold text-slate-500 uppercase tracking-wider truncate">
           {label}
         </p>
-        <p className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 leading-tight">
+        <p className="text-lg sm:text-2xl font-heading font-extrabold text-slate-900 leading-tight">
           {count ?? 0}
         </p>
       </div>

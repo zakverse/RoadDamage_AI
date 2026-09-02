@@ -142,30 +142,30 @@ export default function App() {
         <QuickStats />
 
         {/* 4. Detection Workspace */}
-        <section id="detect" className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-12 scroll-mt-24">
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <span className="font-heading font-bold text-xs uppercase tracking-wider text-brand-green px-3.5 py-1 rounded-full bg-brand-green-light border border-brand-green/30 inline-flex items-center gap-1.5 shadow-sm">
+        <section id="detect" className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-8 sm:py-12 scroll-mt-20 sm:scroll-mt-24">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+            <span className="font-heading font-bold text-xs uppercase tracking-wider text-brand-green px-3 py-1 rounded-full bg-brand-green-light border border-brand-green/30 inline-flex items-center gap-1.5 shadow-sm">
               <Sparkles size={14} className="fill-brand-green text-brand-green" />
               Interactive Detection Workspace
             </span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-3 mb-2 tracking-tight">
+            <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-2 sm:mt-3 mb-2 tracking-tight">
               Road Damage Detector
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 font-medium">
+            <p className="text-xs sm:text-base text-slate-600 font-medium px-2 sm:px-0">
               Upload an image and let YOLOv8 analyze the road condition with instant visual bounding boxes.
             </p>
           </div>
 
           {/* Error Alert Pill */}
           {errorMessage && (
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-900 text-sm font-semibold flex items-center justify-between shadow-clay-sm animate-shake">
-              <div className="flex items-center gap-3">
-                <AlertCircle size={22} className="text-rose-600 shrink-0" />
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-900 text-xs sm:text-sm font-semibold flex items-center justify-between shadow-clay-sm animate-shake">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <AlertCircle size={20} className="text-rose-600 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
               <button
                 onClick={() => setErrorMessage(null)}
-                className="p-1 rounded-lg hover:bg-rose-100 text-rose-700 transition-colors"
+                className="p-1 rounded-lg hover:bg-rose-100 text-rose-700 transition-colors shrink-0"
               >
                 <X size={18} />
               </button>
@@ -173,7 +173,7 @@ export default function App() {
           )}
 
           {/* Detection Dual-Panel Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
             {/* Left: Upload and Controls */}
             <div className="lg:col-span-5">
               <ImageUploader
